@@ -43,7 +43,7 @@ class ViewController: UIViewController, CBCentralManagerDelegate, CBPeripheralDe
         // NOTICE: To run the project, enter the the file location as a string down below!!!!
         let fileLocation: String = "/Users/xuehanyu/Downloads/RunRiteApp-master/data.txt"
         
-        arduinoDataInString = readArduinoDataFromFile(fileLocation)
+//        arduinoDataInString = readArduinoDataFromFile(fileLocation)
         
         
         //  ******Shuoqi - initialize the color of the colorButtons *********************************************************
@@ -419,18 +419,21 @@ class ViewController: UIViewController, CBCentralManagerDelegate, CBPeripheralDe
         var data: [Int8] = [0,0,0,0,0];
         characteristic.value!.getBytes(&dataValue, range:NSRange(location: 0, length: 20)) //@han intert !
         var now = 0;
+        var strTemp : String = ""
         for index in 0...19{
             if(now >= 5) {   break; }
             if(dataValue[index] == Int8(58)){
+                arduinoDataInString.append(strTemp);
                 ++now;
+                strTemp = ""
             }else{
+                strTemp += String(Character(UnicodeScalar(UInt32(dataValue[index]))));
                 dataValue[index] -= Int8(48);
-                data[now] = data[now]*Int8(10) + dataValue[index];
+                data[now] = data[now]*Int8(10) + dataValue[index];                
             }
         }
         print(data)
-        print(dataValue)
-        
+        ++totalNumberOfRowInFile;
     }
     
     //@HanyuX
