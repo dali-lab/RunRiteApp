@@ -56,8 +56,7 @@
                                         <exclude reference="j44-sg-W5A"/>
                                     </mask>
                                 </variation>
-                                <variation key="widthClass=compact" misplaced="YES">
-                                    <rect key="frame" x="57" y="133" width="50" height="50"/>
+                                <variation key="widthClass=compact">
                                     <mask key="constraints">
                                         <include reference="he9-4z-woz"/>
                                         <include reference="j44-sg-W5A"/>
@@ -84,8 +83,7 @@
                                         <exclude reference="pBj-48-gfz"/>
                                     </mask>
                                 </variation>
-                                <variation key="widthClass=compact" misplaced="YES">
-                                    <rect key="frame" x="154" y="193" width="50" height="50"/>
+                                <variation key="widthClass=compact">
                                     <mask key="constraints">
                                         <include reference="EJo-Qj-yjh"/>
                                         <include reference="pBj-48-gfz"/>
