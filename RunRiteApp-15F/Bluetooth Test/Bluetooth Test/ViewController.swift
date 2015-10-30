@@ -46,7 +46,7 @@ class ViewController: UIViewController, CBCentralManagerDelegate, CBPeripheralDe
         
         let retrieveTempDataFromViewController = tempData()
         arduinoDataInString = retrieveTempDataFromViewController.data
-        totalNumberOfRowInFile = (arduinoDataInString.count)/5
+        totalNumberOfRowInFile = (arduinoDataInString.count) / 5
 
         
      //  ******Shuoqi - initialize the color of the colorButtons *********************************************************
@@ -109,9 +109,13 @@ class ViewController: UIViewController, CBCentralManagerDelegate, CBPeripheralDe
 
     }
 
-    
+    @IBAction func stopButton(sender: UIButton) {
+        timer.invalidate()
+        
+    }
     
     //  ******Shuoqi - createRandomColor (Useless right now) ***********************************************************
+
        func createRGBColor() -> UIColor{
 //            read in the files here.
     
@@ -197,11 +201,17 @@ class ViewController: UIViewController, CBCentralManagerDelegate, CBPeripheralDe
         print("button1: \(dataValueOfButton1), button2: \(dataValueOfButton2),button3: \(dataValueOfButton3),button4: \(dataValueOfButton4),button5: \(dataValueOfButton5)")
         
         // Show the actual data values on the color buttons.
-        colorButton1.setTitle("\(dataValueOfButton1)", forState: .Normal)
-        colorButton2.setTitle("\(dataValueOfButton2)", forState: .Normal)
-        colorButton3.setTitle("\(dataValueOfButton3)", forState: .Normal)
-        colorButton4.setTitle("\(dataValueOfButton4)", forState: .Normal)
-        colorButton5.setTitle("\(dataValueOfButton5)", forState: .Normal)
+//        colorButton1.setTitle("\(dataValueOfButton1)", forState: .Normal)
+//        colorButton2.setTitle("\(dataValueOfButton2)", forState: .Normal)
+//        colorButton3.setTitle("\(dataValueOfButton3)", forState: .Normal)
+//        colorButton4.setTitle("\(dataValueOfButton4)", forState: .Normal)
+//        colorButton5.setTitle("\(dataValueOfButton5)", forState: .Normal)
+        
+                colorButton1.setTitle("", forState: .Normal)
+                colorButton2.setTitle("", forState: .Normal)
+                colorButton3.setTitle("", forState: .Normal)
+                colorButton4.setTitle("", forState: .Normal)
+                colorButton5.setTitle("", forState: .Normal)
 
         // The following code is not needed, only to give useful information when an error occur
         if dataValueOfButton1 == 2222 && dataValueOfButton2 == 2222 {
