@@ -113,6 +113,7 @@ class ViewController: UIViewController, CBCentralManagerDelegate, CBPeripheralDe
     //  ******Shuoqi - initialize timer when pressing the startButton **************************************************
 
     @IBAction func startButton(sender: UIButton) {
+//       IfPaused is a global variable used to determined whether the timer is paused.
         
         switch ifPaused{
         case true:
@@ -136,27 +137,29 @@ class ViewController: UIViewController, CBCentralManagerDelegate, CBPeripheralDe
         NSRunLoop.currentRunLoop().addTimer(timer, forMode: NSRunLoopCommonModes)
     }
 
-
-    @IBAction func stopButton(sender: UIButton) {
-        resetTimer()
-    }
     
     @IBAction func sliderChanged(sender: UISlider) {
         
-        
+       // Store then current position of the slider thumb (Stored as a number)
        let sliderCurrentValue = Float(sender.value)
         
+       // Round up the position value to an integer
        let currentRowNumber = Int(sliderCurrentValue)
-    
+        
+        // Show the current row number
         sliderLabel.text = "Row: \(currentRowNumber )"
         
+//        Call function to retrieve 5 data points corresponding to the row with correct index
         retrieveDataAccordingToIndexOfRow(currentRowNumber)
+        
         
         resetTimer()
         
+        // Check if the timer is working, the button title will be shown as "Pause"
         if ifPaused == false {
             startButton.setTitle("Resume", forState: UIControlState.Normal)
             ifPaused = true
+        // Check if the timer is paused, the button title will be shown as "Resume"
         } else if ifPaused == true {
             ifPaused = false
             
@@ -164,52 +167,64 @@ class ViewController: UIViewController, CBCentralManagerDelegate, CBPeripheralDe
         
     }
     
-    
+    // This function deals with the
     @IBAction func stepperChanged(sender: UIStepper) {
         
+//        set and initialize some local variables
         let currentStepValue: Int = Int(sender.value)
         var speedRateDisplayedOnLabel: Float = 0
     
-        
+//        The stepper Min and Max are set to 1 and 20
+//        !!!Note the following calculation might have some logic errors. Need to double check.
+//        If the stepper shows values between 1 - 9 then the speed slows down
         if currentStepValue >= 1 && currentStepValue <= 9 {
             timerSpeedRate = 10 - Float(currentStepValue)
             speedRateDisplayedOnLabel =  Float(currentStepValue) * 0.1
         } else if currentStepValue > 10 && currentStepValue <= 20 {
+//            If the stepper shows values between 11 - 20 then the speed goes up
             timerSpeedRate = 0.1 *  Float(10 - (currentStepValue - 10))
             speedRateDisplayedOnLabel =  Float(currentStepValue - 10)
         } else {
+            // If the Stepper value is 10 then the speed is normal.
+            // Note the protential problem is that "speed 1x"will appear twice, need to be solved.
             timerSpeedRate = 1
             speedRateDisplayedOnLabel =  1
         }
         
-  
+      // Show the current speed ration.
         speedStepperLabel.text = "Speed x \(speedRateDisplayedOnLabel)"
 //        speedStepperLabel.text = "rate: \(timerSpeedRate). display:\(speedRateDisplayedOnLabel)"
-//
-//        
+
+//      Stop the timer (No so sure if this step is absolutely necessary)
         resetTimer()
+    
+//        Reset the current index of rows so the app can continue reading data when the display speed is adjusted.
         indexOfRowFromArduinoDataFile = Int(sliderControl.value)
+        
+//        Restart the timer again not so sure whether we can skip this step)
         initializeTimer()
-        
-        
     }
     
+//    This function reset the timer.
     func resetTimer() {
         timer.invalidate()
         indexOfRowFromArduinoDataFile = 1
     }
     
+//    This function only retrieves five data points (using the current index of the row)
+//    The function is mostly used to extact and show the 5 numbers when the timer is paused.
+    
     func retrieveDataAccordingToIndexOfRow(rowNumber: Int){
-        
         changeButtonColor(arduinoDataInString, rowNumber: rowNumber)
         
-
+        // Extract the five numbers fromt he row
            let dataValueOfButton1 = Int(arduinoDataInString[((rowNumber-1)*5)+0])!
            let dataValueOfButton2 = Int(arduinoDataInString[((rowNumber-1)*5)+1])!
            let dataValueOfButton3 = Int(arduinoDataInString[((rowNumber-1)*5)+2])!
            let dataValueOfButton4 = Int(arduinoDataInString[((rowNumber-1)*5)+3])!
            let dataValueOfButton5 = Int(arduinoDataInString[((rowNumber-1)*5)+4])!
         
+        // Show the Numbers on
         colorButton1.setTitle("\(dataValueOfButton1)", forState: .Normal)
         colorButton2.setTitle("\(dataValueOfButton2)", forState: .Normal)
         colorButton3.setTitle("\(dataValueOfButton3)", forState: .Normal)
