@@ -23,6 +23,8 @@ class ViewController: UIViewController, CBCentralManagerDelegate, CBPeripheralDe
     var totalNumberOfRowInFile: Int = 0
     var timerInitialization : Int = 0
     var arduinoDataInString: [String] = ["0"]
+    var ifPaused: Bool = true
+    var timerSpeedRate: Float = 1
     
     //  ******Shuoqi- colorButtons *************************************************************************************
     @IBOutlet weak var colorButton1: CustomDrawnCircleView!
@@ -31,7 +33,10 @@ class ViewController: UIViewController, CBCentralManagerDelegate, CBPeripheralDe
     @IBOutlet weak var colorButton4: CustomDrawnCircleView!
     @IBOutlet weak var colorButton5: CustomDrawnCircleView!
     @IBOutlet weak var startButton: UIButton!
-
+    @IBOutlet weak var sliderControl: UISlider!
+    @IBOutlet weak var sliderLabel: UILabel!
+    @IBOutlet weak var speedStepperLabel: UILabel!
+    @IBOutlet weak var stepperControl: UIStepper!
 
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -47,7 +52,11 @@ class ViewController: UIViewController, CBCentralManagerDelegate, CBPeripheralDe
         let retrieveTempDataFromViewController = tempData()
         arduinoDataInString = retrieveTempDataFromViewController.data
         totalNumberOfRowInFile = (arduinoDataInString.count) / 5
-
+        
+        sliderControl.minimumValue = 1
+        sliderControl.maximumValue = Float(totalNumberOfRowInFile)
+        stepperControl.value = 10
+        
         
      //  ******Shuoqi - initialize the color of the colorButtons *********************************************************
         colorButton1.fillColor = UIColor.whiteColor()
@@ -55,6 +64,7 @@ class ViewController: UIViewController, CBCentralManagerDelegate, CBPeripheralDe
         colorButton3.fillColor = UIColor.whiteColor()
         colorButton4.fillColor = UIColor.whiteColor()
         colorButton5.fillColor = UIColor.whiteColor()
+        
     }
 
     
@@ -103,16 +113,114 @@ class ViewController: UIViewController, CBCentralManagerDelegate, CBPeripheralDe
     //  ******Shuoqi - initialize timer when pressing the startButton **************************************************
 
     @IBAction func startButton(sender: UIButton) {
-        // Press the start button, the timer will start, refresing the color every 0.2 second.
-        timer = NSTimer(timeInterval: 0.1, target: self, selector: "countUp", userInfo: nil, repeats: true)
-        NSRunLoop.currentRunLoop().addTimer(timer, forMode: NSRunLoopCommonModes)
+        
+        switch ifPaused{
+        case true:
+            initializeTimer()
+            indexOfRowFromArduinoDataFile = Int(sliderControl.value)
+            ifPaused = false
+            startButton.setTitle("Pause", forState: UIControlState.Normal)
+        case false:
+            resetTimer()
+            startButton.setTitle("Resume", forState: UIControlState.Normal)
+            ifPaused = true
+        }
 
     }
+    
+    func initializeTimer() {
+        let timeLapse: Double = Double(0.1 * Double(timerSpeedRate))
+        
+        // Press the start button, the timer will start, refresing the color every 0.2 second.
+        timer = NSTimer(timeInterval: timeLapse, target: self, selector: "countUp", userInfo: nil, repeats: true)
+        NSRunLoop.currentRunLoop().addTimer(timer, forMode: NSRunLoopCommonModes)
+    }
+
 
     @IBAction func stopButton(sender: UIButton) {
-        timer.invalidate()
+        resetTimer()
+    }
+    
+    @IBAction func sliderChanged(sender: UISlider) {
+        
+        
+       let sliderCurrentValue = Float(sender.value)
+        
+       let currentRowNumber = Int(sliderCurrentValue)
+    
+        sliderLabel.text = "Row: \(currentRowNumber )"
+        
+        retrieveDataAccordingToIndexOfRow(currentRowNumber)
+        
+        resetTimer()
+        
+        if ifPaused == false {
+            startButton.setTitle("Resume", forState: UIControlState.Normal)
+            ifPaused = true
+        } else if ifPaused == true {
+            ifPaused = false
+            
+        }
         
     }
+    
+    
+    @IBAction func stepperChanged(sender: UIStepper) {
+        
+        let currentStepValue: Int = Int(sender.value)
+        var speedRateDisplayedOnLabel: Float = 0
+    
+        
+        if currentStepValue >= 1 && currentStepValue <= 9 {
+            timerSpeedRate = 10 - Float(currentStepValue)
+            speedRateDisplayedOnLabel =  Float(currentStepValue) * 0.1
+        } else if currentStepValue > 10 && currentStepValue <= 20 {
+            timerSpeedRate = 0.1 *  Float(10 - (currentStepValue - 10))
+            speedRateDisplayedOnLabel =  Float(currentStepValue - 10)
+        } else {
+            timerSpeedRate = 1
+            speedRateDisplayedOnLabel =  1
+        }
+        
+  
+        speedStepperLabel.text = "Speed x \(speedRateDisplayedOnLabel)"
+//        speedStepperLabel.text = "rate: \(timerSpeedRate). display:\(speedRateDisplayedOnLabel)"
+//
+//        
+        resetTimer()
+        indexOfRowFromArduinoDataFile = Int(sliderControl.value)
+        initializeTimer()
+        
+        
+    }
+    
+    func resetTimer() {
+        timer.invalidate()
+        indexOfRowFromArduinoDataFile = 1
+    }
+    
+    func retrieveDataAccordingToIndexOfRow(rowNumber: Int){
+        
+        changeButtonColor(arduinoDataInString, rowNumber: rowNumber)
+        
+
+           let dataValueOfButton1 = Int(arduinoDataInString[((rowNumber-1)*5)+0])!
+           let dataValueOfButton2 = Int(arduinoDataInString[((rowNumber-1)*5)+1])!
+           let dataValueOfButton3 = Int(arduinoDataInString[((rowNumber-1)*5)+2])!
+           let dataValueOfButton4 = Int(arduinoDataInString[((rowNumber-1)*5)+3])!
+           let dataValueOfButton5 = Int(arduinoDataInString[((rowNumber-1)*5)+4])!
+        
+        colorButton1.setTitle("\(dataValueOfButton1)", forState: .Normal)
+        colorButton2.setTitle("\(dataValueOfButton2)", forState: .Normal)
+        colorButton3.setTitle("\(dataValueOfButton3)", forState: .Normal)
+        colorButton4.setTitle("\(dataValueOfButton4)", forState: .Normal)
+        colorButton5.setTitle("\(dataValueOfButton5)", forState: .Normal)
+        print(dataValueOfButton1)
+        
+        
+    }
+    
+    
     
     //  ******Shuoqi - createRandomColor (Useless right now) ***********************************************************
 
@@ -142,11 +250,13 @@ class ViewController: UIViewController, CBCentralManagerDelegate, CBPeripheralDe
         
         // When reaching to the end row of the file, jump back to the first row and go through the data again
         if indexOfRowFromArduinoDataFile >= totalNumberOfRowInFile {
-            indexOfRowFromArduinoDataFile = 0
+            indexOfRowFromArduinoDataFile = 1
         }
         
         // Print out the row that the program is currently pulling data from
         print(indexOfRowFromArduinoDataFile)
+        sliderLabel.text = "Row: \(indexOfRowFromArduinoDataFile)"
+        sliderControl.value = Float(indexOfRowFromArduinoDataFile)
         
         
         // Call func changeButtonColor
