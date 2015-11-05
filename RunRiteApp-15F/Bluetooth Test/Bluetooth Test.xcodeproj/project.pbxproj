@@ -7,8 +7,9 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
-		B4C41ED71BD48845000584E1 /* 400 mile data Heel Running 2.txt in Resources */ = {isa = PBXBuildFile; fileRef = B4C41ED61BD48845000584E1 /* 400 mile data Heel Running 2.txt */; settings = {ASSET_TAGS = (); }; };
-		B4C41EDA1BD48A48000584E1 /* CustomDrawnCircleView.swift in Sources */ = {isa = PBXBuildFile; fileRef = B4C41ED91BD48A48000584E1 /* CustomDrawnCircleView.swift */; settings = {ASSET_TAGS = (); }; };
+		B4C41ED71BD48845000584E1 /* 400 mile data Heel Running 2.txt in Resources */ = {isa = PBXBuildFile; fileRef = B4C41ED61BD48845000584E1 /* 400 mile data Heel Running 2.txt */; };
+		B4C41EDA1BD48A48000584E1 /* CustomDrawnCircleView.swift in Sources */ = {isa = PBXBuildFile; fileRef = B4C41ED91BD48A48000584E1 /* CustomDrawnCircleView.swift */; };
+		B4E49DF51BE3FCEF00535C3B /* tempData.swift in Sources */ = {isa = PBXBuildFile; fileRef = B4E49DF41BE3FCEF00535C3B /* tempData.swift */; };
 		BAA22A2C1BC1613B00E025C5 /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = BAA22A2B1BC1613B00E025C5 /* AppDelegate.swift */; };
 		BAA22A2E1BC1613B00E025C5 /* ViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = BAA22A2D1BC1613B00E025C5 /* ViewController.swift */; };
 		BAA22A311BC1613B00E025C5 /* Main.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = BAA22A2F1BC1613B00E025C5 /* Main.storyboard */; };
@@ -38,6 +39,7 @@
 /* Begin PBXFileReference section */
 		B4C41ED61BD48845000584E1 /* 400 mile data Heel Running 2.txt */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; name = "400 mile data Heel Running 2.txt"; path = "../../400 mile data Heel Running 2.txt"; sourceTree = "<group>"; };
 		B4C41ED91BD48A48000584E1 /* CustomDrawnCircleView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = CustomDrawnCircleView.swift; sourceTree = "<group>"; };
+		B4E49DF41BE3FCEF00535C3B /* tempData.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = tempData.swift; sourceTree = "<group>"; };
 		BAA22A281BC1613B00E025C5 /* Bluetooth Test.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = "Bluetooth Test.app"; sourceTree = BUILT_PRODUCTS_DIR; };
 		BAA22A2B1BC1613B00E025C5 /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
 		BAA22A2D1BC1613B00E025C5 /* ViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ViewController.swift; sourceTree = "<group>"; };
@@ -112,6 +114,7 @@
 				BAA22A2B1BC1613B00E025C5 /* AppDelegate.swift */,
 				BAA22A2D1BC1613B00E025C5 /* ViewController.swift */,
 				B4C41ED91BD48A48000584E1 /* CustomDrawnCircleView.swift */,
+				B4E49DF41BE3FCEF00535C3B /* tempData.swift */,
 				BAA22A2F1BC1613B00E025C5 /* Main.storyboard */,
 				BAA22A321BC1613B00E025C5 /* Assets.xcassets */,
 				B4C41ED81BD48850000584E1 /* Test data */,
@@ -274,6 +277,7 @@
 				B4C41EDA1BD48A48000584E1 /* CustomDrawnCircleView.swift in Sources */,
 				BAA22A2E1BC1613B00E025C5 /* ViewController.swift in Sources */,
 				BAA22A2C1BC1613B00E025C5 /* AppDelegate.swift in Sources */,
+				B4E49DF51BE3FCEF00535C3B /* tempData.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

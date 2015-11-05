@@ -1,17 +1,21 @@
+
+
+
+
 import UIKit
 import CoreBluetooth
 class ViewController: UIViewController, CBCentralManagerDelegate, CBPeripheralDelegate{
     @IBOutlet weak var tableView: UITableView!
     //Add Device
-    var manager: CBCentralManager!
-    var peripheral: CBPeripheral!
-    var writeCharacteristic: CBCharacteristic!
+        var manager: CBCentralManager!
+        var peripheral: CBPeripheral!
+        var writeCharacteristic: CBCharacteristic!
     
     //Store All Bluetooth Device Around
-    var deviceList:NSMutableArray = NSMutableArray()
+        var deviceList:NSMutableArray = NSMutableArray()
     //UUID of Service and Characteristic
-    let kServiceUUID = [CBUUID(string:"2220")]
-    let kCharacteristicUUID = [CBUUID(string:"2221")]
+        let kServiceUUID = [CBUUID(string:"2220")]
+        let kCharacteristicUUID = [CBUUID(string:"2221")]
     
     //  ******Shuoqi - global variables  *******************************************************************************
     var timer = NSTimer()
@@ -19,9 +23,8 @@ class ViewController: UIViewController, CBCentralManagerDelegate, CBPeripheralDe
     var totalNumberOfRowInFile: Int = 0
     var timerInitialization : Int = 0
     var arduinoDataInString: [String] = ["0"]
-    //  ****************************************************************************************************************
-    
-    
+    var ifPaused: Bool = true
+    var timerSpeedRate: Float = 1
     
     //  ******Shuoqi- colorButtons *************************************************************************************
     @IBOutlet weak var colorButton1: CustomDrawnCircleView!
@@ -30,30 +33,40 @@ class ViewController: UIViewController, CBCentralManagerDelegate, CBPeripheralDe
     @IBOutlet weak var colorButton4: CustomDrawnCircleView!
     @IBOutlet weak var colorButton5: CustomDrawnCircleView!
     @IBOutlet weak var startButton: UIButton!
-    
-    //  ****************************************************************************************************************
-    override
-    
-    
-    func viewDidLoad() {
+    @IBOutlet weak var sliderControl: UISlider!
+    @IBOutlet weak var sliderLabel: UILabel!
+    @IBOutlet weak var speedStepperLabel: UILabel!
+    @IBOutlet weak var stepperControl: UIStepper!
+
+    override func viewDidLoad() {
         super.viewDidLoad()
         //Create A Central Manager
         self.manager = CBCentralManager(delegate: self, queue: nil)
         
         // NOTICE: To run the project, enter the the file location as a string down below!!!!
-        let fileLocation: String = "/Users/xuehanyu/Downloads/RunRiteApp-master/data.txt"
+        // The following lines of code are blocked out because we are reading the data from a class instead
         
+//        let fileLocation: String = "/Users/Shuoqi/Desktop/RunRiteApp-master/400 mile data Heel Running 2.txt"
 //        arduinoDataInString = readArduinoDataFromFile(fileLocation)
         
-        
-        //  ******Shuoqi - initialize the color of the colorButtons *********************************************************
-        colorButton1.fillColor = UIColor.whiteColor()
-        colorButton2.fillColor = UIColor.whiteColor()
-        colorButton3.fillColor = UIColor.whiteColor()
-        colorButton4.fillColor = UIColor.whiteColor()
-        colorButton5.fillColor = UIColor.whiteColor()
+//        let retrieveTempDataFromViewController = tempData()
+//        arduinoDataInString = retrieveTempDataFromViewController.data
+//        totalNumberOfRowInFile = (arduinoDataInString.count) / 5
+//        
+//        
+//        sliderControl.minimumValue = 1
+//        sliderControl.maximumValue = Float(totalNumberOfRowInFile)
+//        stepperControl.value = 10
+//        
+//        
+//     //  ******Shuoqi - initialize the color of the colorButtons *********************************************************
+//        colorButton1.fillColor = UIColor.whiteColor()
+//        colorButton2.fillColor = UIColor.whiteColor()
+//        colorButton3.fillColor = UIColor.whiteColor()
+//        colorButton4.fillColor = UIColor.whiteColor()
+//        colorButton5.fillColor = UIColor.whiteColor()
     }
-    //  ****************************************************************************************************************
+
     
     //  ******Shuoqi - read data from file *******************************************************************************
     func readArduinoDataFromFile(fileLocation: String) -> [String]{
@@ -62,7 +75,6 @@ class ViewController: UIViewController, CBCentralManagerDelegate, CBPeripheralDe
         //  Remember to enter the location of your test file.
         let location = NSString(string: fileLocation).stringByExpandingTildeInPath
         let fileContent = try? NSString(contentsOfFile: location, encoding: NSUTF8StringEncoding)
-        
         
         // Convert the read-in data from NSString to String
         let fileContentString = fileContent as! String
@@ -96,29 +108,138 @@ class ViewController: UIViewController, CBCentralManagerDelegate, CBPeripheralDe
         }
         
         return arduinoDataInString
-        
+
     }
-    //  ****************************************************************************************************************
-    
-    
-    
-    
-    
     //  ******Shuoqi - initialize timer when pressing the startButton **************************************************
-    
+
     @IBAction func startButton(sender: UIButton) {
+//       IfPaused is a global variable used to determined whether the timer is paused.
+        switch ifPaused{
+        case true:
+            initializeTimer()
+            indexOfRowFromArduinoDataFile = Int(sliderControl.value)
+            ifPaused = false
+            startButton.setTitle("Pause", forState: UIControlState.Normal)
+        case false:
+            resetTimer()
+            startButton.setTitle("Resume", forState: UIControlState.Normal)
+            ifPaused = true
+        }
+
+    }
+    
+    func initializeTimer() {
+        let timeLapse: Double = Double(0.1 * Double(timerSpeedRate))
+        
         // Press the start button, the timer will start, refresing the color every 0.2 second.
-        timer = NSTimer(timeInterval: 0.1, target: self, selector: "countUp", userInfo: nil, repeats: true)
+        timer = NSTimer(timeInterval: timeLapse, target: self, selector: "countUp", userInfo: nil, repeats: true)
         NSRunLoop.currentRunLoop().addTimer(timer, forMode: NSRunLoopCommonModes)
+    }
+
+    
+    @IBAction func sliderChanged(sender: UISlider) {
+        
+       // Store then current position of the slider thumb (Stored as a number)
+       let sliderCurrentValue = Float(sender.value)
+        
+       // Round up the position value to an integer
+       let currentRowNumber = Int(sliderCurrentValue)
+        
+        // Show the current row number
+        sliderLabel.text = "Row: \(currentRowNumber )"
+        
+//        Call function to retrieve 5 data points corresponding to the row with correct index
+        retrieveDataAccordingToIndexOfRow(currentRowNumber)
+        
+        
+        resetTimer()
+        
+        // Check if the timer is working, the button title will be shown as "Pause"
+        if ifPaused == false {
+            startButton.setTitle("Resume", forState: UIControlState.Normal)
+            ifPaused = true
+        // Check if the timer is paused, the button title will be shown as "Resume"
+        } else if ifPaused == true {
+            ifPaused = false
+            
+        }
         
     }
-    //  ****************************************************************************************************************
+    
+    // This function deals with the
+    @IBAction func stepperChanged(sender: UIStepper) {
+        
+//        set and initialize some local variables
+        let currentStepValue: Int = Int(sender.value)
+        var speedRateDisplayedOnLabel: Float = 0
+    
+//        The stepper Min and Max are set to 1 and 20
+//        !!!Note the following calculation might have some logic errors. Need to double check.
+//        If the stepper shows values between 1 - 9 then the speed slows down
+        if currentStepValue >= 1 && currentStepValue <= 9 {
+            timerSpeedRate = 10 - Float(currentStepValue)
+            speedRateDisplayedOnLabel =  Float(currentStepValue) * 0.1
+        } else if currentStepValue > 10 && currentStepValue <= 20 {
+//            If the stepper shows values between 11 - 20 then the speed goes up
+            timerSpeedRate = 0.1 *  Float(10 - (currentStepValue - 10))
+            speedRateDisplayedOnLabel =  Float(currentStepValue - 10)
+        } else {
+            // If the Stepper value is 10 then the speed is normal.
+            // Note the protential problem is that "speed 1x"will appear twice, need to be solved.
+            timerSpeedRate = 1
+            speedRateDisplayedOnLabel =  1
+        }
+        
+      // Show the current speed ration.
+        speedStepperLabel.text = "Speed x \(speedRateDisplayedOnLabel)"
+//        speedStepperLabel.text = "rate: \(timerSpeedRate). display:\(speedRateDisplayedOnLabel)"
+
+//      Stop the timer (No so sure if this step is absolutely necessary)
+        resetTimer()
+    
+//        Reset the current index of rows so the app can continue reading data when the display speed is adjusted.
+        indexOfRowFromArduinoDataFile = Int(sliderControl.value)
+        
+//        Restart the timer again not so sure whether we can skip this step)
+        initializeTimer()
+    }
+    
+//    This function reset the timer.
+    func resetTimer() {
+        timer.invalidate()
+        indexOfRowFromArduinoDataFile = 1
+    }
+    
+//    This function only retrieves five data points (using the current index of the row)
+//    The function is mostly used to extact and show the 5 numbers when the timer is paused.
+    
+    func retrieveDataAccordingToIndexOfRow(rowNumber: Int){
+        changeButtonColor(arduinoDataInString, rowNumber: rowNumber)
+        
+        // Extract the five numbers fromt he row
+           let dataValueOfButton1 = Int(arduinoDataInString[((rowNumber-1)*5)+0])!
+           let dataValueOfButton2 = Int(arduinoDataInString[((rowNumber-1)*5)+1])!
+           let dataValueOfButton3 = Int(arduinoDataInString[((rowNumber-1)*5)+2])!
+           let dataValueOfButton4 = Int(arduinoDataInString[((rowNumber-1)*5)+3])!
+           let dataValueOfButton5 = Int(arduinoDataInString[((rowNumber-1)*5)+4])!
+        
+        // Show the Numbers on
+        colorButton1.setTitle("\(dataValueOfButton1)", forState: .Normal)
+        colorButton2.setTitle("\(dataValueOfButton2)", forState: .Normal)
+        colorButton3.setTitle("\(dataValueOfButton3)", forState: .Normal)
+        colorButton4.setTitle("\(dataValueOfButton4)", forState: .Normal)
+        colorButton5.setTitle("\(dataValueOfButton5)", forState: .Normal)
+        print(dataValueOfButton1)
+        
+    }
+    
     
     
     //  ******Shuoqi - createRandomColor (Useless right now) ***********************************************************
-    func createRGBColor() -> UIColor{
-        //            read in the files here.
-        
+
+       func createRGBColor() -> UIColor{
+//            read in the files here.
+    
         let myRed = CGFloat(Float((arc4random_uniform(255) + 1))/255)
         let myGreen = CGFloat(Float((arc4random_uniform(255) + 1))/255)
         let myBlue = CGFloat(Float((arc4random_uniform(255) + 1))/255)
@@ -132,8 +253,7 @@ class ViewController: UIViewController, CBCentralManagerDelegate, CBPeripheralDe
         print("red is \(myRed), green is \(myGreen), and blue is \(myBlue).")
         
         return myRandomColor
-    }
-    //  ****************************************************************************************************************
+        }
     
     //  ********Shuoqi - Create timer loop *****************************************************************************
     func countUp() {
@@ -143,11 +263,14 @@ class ViewController: UIViewController, CBCentralManagerDelegate, CBPeripheralDe
         
         // When reaching to the end row of the file, jump back to the first row and go through the data again
         if indexOfRowFromArduinoDataFile >= totalNumberOfRowInFile {
-            indexOfRowFromArduinoDataFile = 0
+            indexOfRowFromArduinoDataFile = 1
         }
         
         // Print out the row that the program is currently pulling data from
         print(indexOfRowFromArduinoDataFile)
+        sliderLabel.text = "Row: \(indexOfRowFromArduinoDataFile)"
+        sliderControl.value = Float(indexOfRowFromArduinoDataFile)
+        
         
         // Call func changeButtonColor
         changeButtonColor(arduinoDataInString, rowNumber: indexOfRowFromArduinoDataFile)
@@ -155,67 +278,73 @@ class ViewController: UIViewController, CBCentralManagerDelegate, CBPeripheralDe
     }
     
     
-    //  ******Shuoqi - Change the fill in Color of the circles according to the data. ************************************
+   //  ******Shuoqi - Change the fill in Color of the circles according to the data. ************************************
     
     func changeButtonColor(rawDataFromFile: [String], rowNumber: Int){
-        
+
         
         
         // Assign a weired initial number to the dataValueOfButtons variables so that if something goes wrong we can check it out.
         
-        var dataValueOfButton1: Int = 2222
-        var dataValueOfButton2: Int = 2222
-        var dataValueOfButton3: Int = 2222
-        var dataValueOfButton4: Int = 2222
-        var dataValueOfButton5: Int = 2222
+                var dataValueOfButton1: Int = 2222
+                var dataValueOfButton2: Int = 2222
+                var dataValueOfButton3: Int = 2222
+                var dataValueOfButton4: Int = 2222
+                var dataValueOfButton5: Int = 2222
         
         // Use k as the increment in the followng for loop.
         var k:Int = 1
         
-        
+
         
         for i in (((rowNumber - 1) * 5) + 1)...(rowNumber * 5){
             
             if k == 1 {
-                dataValueOfButton1 = Int(rawDataFromFile[i-1])!  // Convert the strings in the rawDataFile to number
-                
+                 dataValueOfButton1 = Int(rawDataFromFile[i-1])!  // Convert the strings in the rawDataFile to number
+
             }else if k == 2 {
-                dataValueOfButton2 = Int(rawDataFromFile[i-1])!  // Convert the strings in the rawDataFile to number
+                 dataValueOfButton2 = Int(rawDataFromFile[i-1])!  // Convert the strings in the rawDataFile to number
                 
             }else if k == 3 {
-                dataValueOfButton3 = Int(rawDataFromFile[i-1])!  // Convert the strings in the rawDataFile to number
+                 dataValueOfButton3 = Int(rawDataFromFile[i-1])!  // Convert the strings in the rawDataFile to number
             }
             else if k == 4 {
-                dataValueOfButton4 = Int(rawDataFromFile[i-1])!  // Convert the strings in the rawDataFile to number
+                 dataValueOfButton4 = Int(rawDataFromFile[i-1])!  // Convert the strings in the rawDataFile to number
             }
             else if k == 5 {
-                dataValueOfButton5 = Int(rawDataFromFile[i-1])!  // Convert the strings in the rawDataFile to number
+                 dataValueOfButton5 = Int(rawDataFromFile[i-1])!  // Convert the strings in the rawDataFile to number
             }else{
                 print("Error when assigning number to dataValueOfButton: The loop circles more than 5 times and the value of k exceeds 5. Check the first switch statment in the func changeButtonColor")
             }
-            k = k+1  // Increase k by one.
-            
+                k = k+1  // Increase k by one.
+
         }
         
         // Print out the Data value for convenience
         print("button1: \(dataValueOfButton1), button2: \(dataValueOfButton2),button3: \(dataValueOfButton3),button4: \(dataValueOfButton4),button5: \(dataValueOfButton5)")
         
         // Show the actual data values on the color buttons.
-        colorButton1.setTitle("\(dataValueOfButton1)", forState: .Normal)
-        colorButton2.setTitle("\(dataValueOfButton2)", forState: .Normal)
-        colorButton3.setTitle("\(dataValueOfButton3)", forState: .Normal)
-        colorButton4.setTitle("\(dataValueOfButton4)", forState: .Normal)
-        colorButton5.setTitle("\(dataValueOfButton5)", forState: .Normal)
+//        colorButton1.setTitle("\(dataValueOfButton1)", forState: .Normal)
+//        colorButton2.setTitle("\(dataValueOfButton2)", forState: .Normal)
+//        colorButton3.setTitle("\(dataValueOfButton3)", forState: .Normal)
+//        colorButton4.setTitle("\(dataValueOfButton4)", forState: .Normal)
+//        colorButton5.setTitle("\(dataValueOfButton5)", forState: .Normal)
         
+                colorButton1.setTitle("", forState: .Normal)
+                colorButton2.setTitle("", forState: .Normal)
+                colorButton3.setTitle("", forState: .Normal)
+                colorButton4.setTitle("", forState: .Normal)
+                colorButton5.setTitle("", forState: .Normal)
+
         // The following code is not needed, only to give useful information when an error occur
         if dataValueOfButton1 == 2222 && dataValueOfButton2 == 2222 {
             print("Error when asssigning numbers to the dataValueOfButtonk variables. Check the for loop in func changeButtonColor")
         }
-        
-        
+    
+
         // Using variables to store the RGB colors returned in tuple by the function determineRGBColorAccordingtoData
         for j in 1...5{
-            
+
             switch j{
             case 1:
                 var rgbOfButton1 = determineRGBColorAccordingtoData(dataValueOfButton1)
@@ -240,7 +369,7 @@ class ViewController: UIViewController, CBCentralManagerDelegate, CBPeripheralDe
                 
                 colorButton2.fillColor = newColorButton2
                 colorButton2.setNeedsDisplay()
-                
+
             case 3:
                 var rgbOfButton3 = determineRGBColorAccordingtoData(dataValueOfButton3)
                 
@@ -252,7 +381,7 @@ class ViewController: UIViewController, CBCentralManagerDelegate, CBPeripheralDe
                 
                 colorButton3.fillColor = newColorButton3
                 colorButton3.setNeedsDisplay()
-                
+
             case 4:
                 var rgbOfButton4 = determineRGBColorAccordingtoData(dataValueOfButton4)
                 
@@ -264,7 +393,7 @@ class ViewController: UIViewController, CBCentralManagerDelegate, CBPeripheralDe
                 
                 colorButton4.fillColor = newColorButton4
                 colorButton4.setNeedsDisplay()
-                
+
             case 5:
                 var rgbOfButton5 = determineRGBColorAccordingtoData(dataValueOfButton5)
                 
@@ -282,15 +411,14 @@ class ViewController: UIViewController, CBCentralManagerDelegate, CBPeripheralDe
             }
         }
     }
-    //  ****************************************************************************************************************
     
     //  ***********Shuoqi -  fetch data from the file and calcualte the desirable RGB value*****************************
     func determineRGBColorAccordingtoData(dataValue: Int) ->  (red: CGFloat, green: CGFloat, blue: CGFloat) {
-        // deep blue is 0 deep red is 100
-        // 0 -> 50 Blue 50 -> 100 red
-        // timer every 0.1 second return a tuple so the five circles can independently change color.
-        // red(r:255 does not change; g = b = 30) <- (very red) to (r:255 does not change; g = b = 255) <- almost white
-        // blue(b: 255 does not change, r=g=90) <- (pretty blue) to (b: 255 does not change, r=g=255) <- (almost white)
+            // deep blue is 0 deep red is 100
+            // 0 -> 50 Blue 50 -> 100 red
+            // timer every 0.1 second return a tuple so the five circles can independently change color.
+            // red(r:255 does not change; g = b = 30) <- (very red) to (r:255 does not change; g = b = 255) <- almost white
+            // blue(b: 255 does not change, r=g=90) <- (pretty blue) to (b: 255 does not change, r=g=255) <- (almost white)
         
         // Determine whether to show color blue or red depending on the actual value of the data.
         // If the value of data is smaller than 50, show blue; if bigger than 50, then show red.
@@ -310,25 +438,22 @@ class ViewController: UIViewController, CBCentralManagerDelegate, CBPeripheralDe
         }
         
         switch blueOrRed{
-        case "blue": // Notice that I choose only a color range of desirable red and blue. So I have to make extra calculation accordingly.
-            red = CGFloat(Float((dataValue * ((255 - 90)/50)) + 90) / Float(255))
-            green = red
-            blue = CGFloat(255/255)
-        case "red":
-            red = CGFloat(255/255)
-            green = CGFloat(Float(((dataValue - 50) * ((255 - 30)/50)) + 30) / Float(255))
-            blue = green
-        default:
-            print("error happen in the switch statement in the function determineRGBColorAccording to Data: the variable dataValue is either blue or red.")
+            case "blue": // Notice that I choose only a color range of desirable red and blue. So I have to make extra calculation accordingly.
+                red = CGFloat(Float((dataValue * ((255 - 90)/50)) + 90) / Float(255))
+                green = red
+                blue = CGFloat(255/255)
+            case "red":
+                red = CGFloat(255/255)
+                green = CGFloat(Float(((dataValue - 50) * ((255 - 30)/50)) + 30) / Float(255))
+                blue = green
+            default:
+                print("error happen in the switch statement in the function determineRGBColorAccording to Data: the variable dataValue is either blue or red.")
         }
         
         return(red, green, blue)
-        
-    }
-    //  ****************************************************************************************************************
-    
-    
-    
+            
+        }
+
     
     
     //@HanyuX
@@ -349,7 +474,7 @@ class ViewController: UIViewController, CBCentralManagerDelegate, CBPeripheralDe
             print("Central Device Has no Change")
         }
     }
-    
+
     //@HanyuX
     //When Get Device Which We Are Looking For, Stop Scanning
     //The Data Is Stored in advertisementData. Can Use SBAdertisementData To Get The Data.
@@ -371,13 +496,14 @@ class ViewController: UIViewController, CBCentralManagerDelegate, CBPeripheralDe
         self.peripheral.delegate = self
         self.peripheral.discoverServices(kServiceUUID)
     }
-    
+
     //@HanyuX
     //Connect Fail
     func centralManager(central: CBCentralManager!, didFailToConnectPeripheral peripheral: CBPeripheral!, error: NSError!){
         print("(error)Fail To Connect Device")
     }
     
+    //@HanyuX
     //Scan Characteriscts For A Service
     func peripheral(peripheral: CBPeripheral!, didDiscoverServices error: NSError!){
         if error != nil {
@@ -391,7 +517,7 @@ class ViewController: UIViewController, CBCentralManagerDelegate, CBPeripheralDe
             peripheral.discoverCharacteristics(kCharacteristicUUID, forService: service as! CBService)
         }
     }
-    
+
     //@HanyuX
     //Find Characteristics
     func peripheral(peripheral: CBPeripheral!, didDiscoverCharacteristicsForService service: CBService!, error: NSError!){
@@ -407,33 +533,31 @@ class ViewController: UIViewController, CBCentralManagerDelegate, CBPeripheralDe
             self.peripheral.setNotifyValue(true, forCharacteristic: characteristic as! CBCharacteristic)
         }
     }
-    
+
     //@HanyuX
     //No Matter The Data Is For Read Or Notify, Get Them From This Function.
     func peripheral(peripheral: CBPeripheral!, didUpdateValueForCharacteristic characteristic: CBCharacteristic!,error: NSError!){
-        if(error != nil){
-            print("(error) Data")
-            return
-        }
-        var dataValue: [Int8] = [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0];
-        var data: [Int8] = [0,0,0,0,0];
-        characteristic.value!.getBytes(&dataValue, range:NSRange(location: 0, length: 20)) //@han intert !
-        var now = 0;
-        var strTemp : String = ""
-        for index in 0...19{
-            if(now >= 5) {   break; }
-            if(dataValue[index] == Int8(58)){
-                arduinoDataInString.append(strTemp);
-                ++now;
-                strTemp = ""
-            }else{
-                strTemp += String(Character(UnicodeScalar(UInt32(dataValue[index]))));
-                dataValue[index] -= Int8(48);
-                data[now] = data[now]*Int8(10) + dataValue[index];                
+            if(error != nil){
+                 print("(error) Data")
+                    return
             }
-        }
-        print(data)
-        ++totalNumberOfRowInFile;
+        
+            var dataValue: [Int8] = [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0];
+            var data: [Int8] = [0,0,0,0,0];
+            characteristic.value!.getBytes(&dataValue, range:NSRange(location: 0, length: 20)) //@han intert !
+            var now = 0;
+            for index in 0...19{
+                if(now >= 5) {   break; }
+                if(dataValue[index] == Int8(58)){
+                    arduinoDataInString.append(String(data[now]));
+                    ++now;
+                }else{
+                    dataValue[index] -= Int8(48);
+                    data[now] = data[now]*Int8(10) + dataValue[index];
+                }
+            }
+            ++sliderControl.maximumValue
+            print(data)
     }
     
     //@HanyuX
@@ -478,15 +602,15 @@ class ViewController: UIViewController, CBCentralManagerDelegate, CBPeripheralDe
     }
     
     func numberOfSectionsInTableView(tableView: UITableView)->Int {
-        //#warning Potentially incomplete method implementation.
-        //Return the number of sections.
-        return 1
+            //#warning Potentially incomplete method implementation.
+            //Return the number of sections.
+            return 1
     }
     
     func tableView(tableView: UITableView, numberOfRowsInSection section: Int)->Int {
-        //#warning Incomplete method implementation.
-        //Return the number of rows in the section.
-        return self.deviceList.count
+            //#warning Incomplete method implementation.
+            //Return the number of rows in the section.
+            return self.deviceList.count
     }
     
     func tableView(tableView: UITableView, cellForRowAtIndexPath indexPath: NSIndexPath) ->

@@ -286,7 +286,7 @@ void loop(void) {
         str4.toCharArray(buf4,3);
         str5 = String(ForceMatrix[f][4]);
         str5.toCharArray(buf5,3);
-        cat = str1+separate+str2+separate+str3+separate+str4+separate+str5;
+        cat = str1+separate+str2+separate+str3+separate+str4+separate+str5+separate;
         cat.toCharArray(buf,15);
         Serial.print("first concat = ");
         Serial.println(cat);
@@ -309,7 +309,7 @@ void loop(void) {
       int bps = ((packets * 20) * 8) / secs; 
       Serial.println("Finished");
       Serial.println(secs);
-      Serial.println(bps / 1000.0);
+      Serial.println(bps);
       f = 0;
       sending = false;
     } 
