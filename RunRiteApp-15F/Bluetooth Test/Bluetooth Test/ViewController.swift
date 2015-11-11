@@ -52,12 +52,21 @@ class ViewController: UIViewController, CBCentralManagerDelegate, CBPeripheralDe
         
 //        let retrieveTempDataFromViewController = tempData()
 //        arduinoDataInString = retrieveTempDataFromViewController.data
+
 //          totalNumberOfRowInFile = (arduinoDataInString.count) / 5
 ////
 ////        
 //        sliderControl.minimumValue = 1
 //        sliderControl.maximumValue = Float(totalNumberOfRowInFile)
 //        stepperControl.value = 10
+
+          totalNumberOfRowInFile = (arduinoDataInString.count) / 5
+//        
+//        
+        sliderControl.minimumValue = 1
+        sliderControl.maximumValue = Float(totalNumberOfRowInFile)
+        stepperControl.value = 10
+
 //
 //        
 //     //  ******Shuoqi - initialize the color of the colorButtons *********************************************************
@@ -539,10 +548,12 @@ class ViewController: UIViewController, CBCentralManagerDelegate, CBPeripheralDe
     //No Matter The Data Is For Read Or Notify, Get Them From This Function.
     func peripheral(peripheral: CBPeripheral!, didUpdateValueForCharacteristic characteristic: CBCharacteristic!,error: NSError!){
             if(error != nil){
-                 print("(error) Data")
-                    return
+                print("(error) Data");
+                return;
             }
-        
+            if(characteristic.value?.length == 0){
+                    return;
+            }
             var dataValue: [Int8] = [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0];
             var data: [Int8] = [0,0,0,0,0];
             characteristic.value!.getBytes(&dataValue, range:NSRange(location: 0, length: 20)) //@han intert !
