@@ -37,7 +37,8 @@ class ViewController: UIViewController, CBCentralManagerDelegate, CBPeripheralDe
     @IBOutlet weak var sliderLabel: UILabel!
     @IBOutlet weak var speedStepperLabel: UILabel!
     @IBOutlet weak var stepperControl: UIStepper!
-
+    @IBOutlet weak var updateNoticeLabel: UILabel!
+    
     override func viewDidLoad() {
         super.viewDidLoad()
         //Create A Central Manager
@@ -51,12 +52,12 @@ class ViewController: UIViewController, CBCentralManagerDelegate, CBPeripheralDe
         
 //        let retrieveTempDataFromViewController = tempData()
 //        arduinoDataInString = retrieveTempDataFromViewController.data
-//        totalNumberOfRowInFile = (arduinoDataInString.count) / 5
-//        
-//        
-        sliderControl.minimumValue = 1
-        sliderControl.maximumValue = Float(totalNumberOfRowInFile)
-        stepperControl.value = 10
+//          totalNumberOfRowInFile = (arduinoDataInString.count) / 5
+////
+////        
+//        sliderControl.minimumValue = 1
+//        sliderControl.maximumValue = Float(totalNumberOfRowInFile)
+//        stepperControl.value = 10
 //
 //        
 //     //  ******Shuoqi - initialize the color of the colorButtons *********************************************************
@@ -560,6 +561,14 @@ class ViewController: UIViewController, CBCentralManagerDelegate, CBPeripheralDe
         
         
             print(data)
+        // Shuoqi's test
+            totalNumberOfRowInFile = (arduinoDataInString.count) / 5
+            sliderControl.minimumValue = 1
+            sliderControl.maximumValue = Float(totalNumberOfRowInFile)
+            stepperControl.value = 10
+            updateNoticeLabel.text = "Update completed"        
+        //
+        
     }
     
     //@HanyuX
