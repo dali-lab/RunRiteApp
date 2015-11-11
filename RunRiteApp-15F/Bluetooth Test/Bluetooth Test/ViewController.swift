@@ -559,14 +559,13 @@ class ViewController: UIViewController, CBCentralManagerDelegate, CBPeripheralDe
             }
             ++sliderControl.maximumValue
         
-        
             print(data)
         // Shuoqi's test
             totalNumberOfRowInFile = (arduinoDataInString.count) / 5
             sliderControl.minimumValue = 1
             sliderControl.maximumValue = Float(totalNumberOfRowInFile)
             stepperControl.value = 10
-            updateNoticeLabel.text = "Update completed"        
+            updateNoticeLabel.text = "Update completed"
         //
         
     }
