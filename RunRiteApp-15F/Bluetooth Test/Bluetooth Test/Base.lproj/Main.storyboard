@@ -419,7 +419,9 @@
                             <constraint firstItem="Hoy-a6-saY" firstAttribute="top" secondItem="Alt-Dr-BSl" secondAttribute="bottom" constant="78" id="stk-lj-wtz">
                                 <variation key="widthClass=compact" constant="133"/>
                             </constraint>
-                            <constraint firstItem="uq7-7s-GXO" firstAttribute="top" secondItem="a0M-ex-mSM" secondAttribute="bottom" constant="21" id="the-aP-23b"/>
+                            <constraint firstItem="uq7-7s-GXO" firstAttribute="top" secondItem="a0M-ex-mSM" secondAttribute="bottom" constant="21" id="the-aP-23b">
+                                <variation key="widthClass=compact" constant="15"/>
+                            </constraint>
                             <constraint firstItem="wfy-db-euE" firstAttribute="top" secondItem="a0M-ex-mSM" secondAttribute="bottom" constant="43" id="vVA-qd-BOO">
                                 <variation key="widthClass=compact" constant="57"/>
                             </constraint>
@@ -438,7 +440,9 @@
                             <constraint firstItem="uq7-7s-GXO" firstAttribute="leading" secondItem="8bC-Xf-vdC" secondAttribute="leadingMargin" constant="94" id="y9R-IC-FZ6">
                                 <variation key="widthClass=compact" constant="43"/>
                             </constraint>
-                            <constraint firstItem="wfy-db-euE" firstAttribute="top" secondItem="uq7-7s-GXO" secondAttribute="bottom" constant="15" id="zNi-pB-dMJ"/>
+                            <constraint firstItem="wfy-db-euE" firstAttribute="top" secondItem="uq7-7s-GXO" secondAttribute="bottom" constant="15" id="zNi-pB-dMJ">
+                                <variation key="widthClass=compact" constant="21"/>
+                            </constraint>
                         </constraints>
                         <variation key="default">
                             <mask key="subviews">
