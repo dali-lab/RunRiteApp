@@ -54,10 +54,10 @@ class ViewController: UIViewController, CBCentralManagerDelegate, CBPeripheralDe
 //        totalNumberOfRowInFile = (arduinoDataInString.count) / 5
 //        
 //        
-//        sliderControl.minimumValue = 1
-//        sliderControl.maximumValue = Float(totalNumberOfRowInFile)
-//        stepperControl.value = 10
-//        
+        sliderControl.minimumValue = 1
+        sliderControl.maximumValue = Float(totalNumberOfRowInFile)
+        stepperControl.value = 10
+//
 //        
 //     //  ******Shuoqi - initialize the color of the colorButtons *********************************************************
 //        colorButton1.fillColor = UIColor.whiteColor()
@@ -557,6 +557,8 @@ class ViewController: UIViewController, CBCentralManagerDelegate, CBPeripheralDe
                 }
             }
             ++sliderControl.maximumValue
+        
+        
             print(data)
     }
     
