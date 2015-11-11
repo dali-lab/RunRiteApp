@@ -60,6 +60,8 @@ int packets = 250; //250 packets for 250 rows of ForceMatrix
 boolean sending = false;
 int start; //timing variable
 int flag = false;
+//int flag = true;
+int f = 0; //sending variable
 
 void setup(void) {
   Serial.begin(9600);   // We'll send debugging information via the Serial monitor
@@ -77,7 +79,8 @@ void RFduinoBLE_onConnect() {
 }
  
 void loop(void) {
-  if (sending == false)
+  if (flag == true)
+  //if (sending == false)
   {
     fsrReading2 = analogRead(fsrPin2);  
     
@@ -270,12 +273,13 @@ void loop(void) {
 
   if (sending == true)
   {
+    flag = false;
     char buf[20];
     char separate = ':';
     char buf1[3], buf2[3], buf3[3], buf4[3], buf5[3];
     String str,str1,str2,str3,str4,str5;
     String cat;
-    int f = 0;
+//    int f = 0;
         str1 = String(ForceMatrix[f][0]);
         str1.toCharArray(buf1,3);
         str2 = String(ForceMatrix[f][1]);
@@ -288,11 +292,12 @@ void loop(void) {
         str5.toCharArray(buf5,3);
         cat = str1+separate+str2+separate+str3+separate+str4+separate+str5+separate;
         cat.toCharArray(buf,15);
+     /*   
         Serial.print("first concat = ");
         Serial.println(cat);
         Serial.print("buf = ");
         Serial.println(buf);
-      
+      */
 
     // send is queued (the ble stack delays send to the start of the next tx window)
     while (! RFduinoBLE.send(buf,20))
@@ -302,6 +307,9 @@ void loop(void) {
       start = millis();
     
     f++;
+/*    Serial.print("f = ");
+    Serial.println(f);
+*/
     if (f >= packets)
     {
       int ended = millis();
@@ -309,7 +317,7 @@ void loop(void) {
       int bps = ((packets * 20) * 8) / secs; 
       Serial.println("Finished");
       Serial.println(secs);
-      Serial.println(bps);
+      Serial.println(bps / 1000.0);
       f = 0;
       sending = false;
     } 
